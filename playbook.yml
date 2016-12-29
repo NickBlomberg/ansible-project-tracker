@@ -1,0 +1,18 @@
+---
+- hosts: all
+  user: "{{ user_account }}"
+
+  vars_files:
+    - vars/main.yml
+    - vars/keys.yml
+
+  tasks:
+    - include: tasks/common.yml
+    - include: tasks/postgres.yml
+    - include: tasks/aolserver.yml
+
+    - include: tasks/create-db.yml instance={{ staging_instance }}
+    - include: tasks/deploy.yml instance=prjtrk repo_url={{ staging_repo_url }}
+
+    - include: tasks/create-db.yml instance={{ bugfix_instance}}
+    - include: tasks/deploy.yml instance=pttest repo_url={{ bugfix_repo_url }}

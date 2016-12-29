@@ -1,0 +1,43 @@
+---
+- name: COMMON install python interface required by Ansible DNF module
+  raw: dnf install -yq python2-dnf
+  changed_when: False
+
+- name: COMMON install extra dependencies required by the development system
+  dnf: name={{ item }} state=present
+  with_items:
+      - gcc
+      - kernel-devel
+      - kernel-headers
+      - readline-devel
+      - zlib-devel
+      - subversion
+      - python-devel
+      - python-psycopg2
+      - libselinux-python
+      - redhat-rpm-config
+      - libpqxx
+
+- name: COMMON ensure .ssh directory exists
+  file:
+    dest: "{{ user_home }}/.ssh/"
+    mode: 0700
+    owner: vagrant
+    group: vagrant
+    state: directory
+
+- name: COMMON copy private key
+  copy:
+    content: "{{ private_key }}"
+    dest: "{{ user_home }}/.ssh/id_rsa"
+    mode: 0600
+    owner: vagrant
+    group: vagrant
+
+- name: COMMON copy public key
+  copy:
+    content: "{{ public_key }}"
+    dest: "{{ user_home }}/.ssh/id_rsa.pub"
+    mode: 0644
+    owner: vagrant
+    group: vagrant

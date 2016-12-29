@@ -1,0 +1,8 @@
+[Unit]
+Description=Run the staging instance of Project Tracker
+
+[Timer]
+OnBootSec=1min
+
+[Install]
+WantedBy=timers.target

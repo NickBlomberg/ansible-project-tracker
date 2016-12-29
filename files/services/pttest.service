@@ -1,0 +1,24 @@
+[Unit]
+Description=Project Tracker Test Server
+After=postgresql.service
+Requires=postgresql.service
+
+[Service]
+Type=forking
+TimeoutSec=60
+User=aolserver
+Group=aolserver
+
+SyslogIdentifier=pttest
+PIDFile=/var/log/aolserver/nspid.pttest
+
+PermissionsStartOnly=true
+
+ExecStartPre= /usr/bin/mkdir -p /var/run/postgresql
+ExecStartPre= /usr/bin/ln -sf /tmp/.s.PGSQL.5432 /var/run/postgresql/.s.PGSQL.5432
+ExecStart= /opt/aolserver/bin/nsd -t /etc/aolserver/pttest.tcl
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStop=/bin/kill -TERM $MAINPID
+
+[Install]
+WantedBy=multi-user.target

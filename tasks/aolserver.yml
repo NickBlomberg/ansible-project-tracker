@@ -1,0 +1,43 @@
+---
+- name: AOLSERVER create a user account for aolserver
+  user:
+    name: aolserver
+    home: /opt/aolserver
+    state: present
+
+- name: AOLSERVER ensure directory for aolserver configurations exists
+  become: yes
+  file:
+    path: /etc/aolserver
+    state: directory
+    owner: aolserver
+    group: aolserver
+
+- name: AOLSERVER copy common aolserver config files
+  copy:
+    src: files/config/{{ item }}.tcl
+    dest: /etc/aolserver
+    owner: aolserver
+    group: aolserver
+    mode: 0644
+  with_items:
+    - base
+    - mime-types
+
+- name: AOLSERVER copy aolserver RPM files
+  copy:
+    src: files/rpm/
+    dest: /tmp/rpm/
+
+- name: AOLSERVER install aolserver RPMS
+  yum:
+    name: /tmp/rpm/{{ item }}.rpm
+    state: present
+  with_items:
+    - aolserver-tcl
+    - aolserver
+    - aolserver-tdom
+    - nscache
+    - nsldap
+    - nssha1
+    - nspostgres

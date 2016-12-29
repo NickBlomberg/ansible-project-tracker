@@ -1,0 +1,17 @@
+---
+user_account: vagrant
+user_home: /home/vagrant
+
+postgres_source_url: https://ftp.postgresql.org/pub/source/v8.4.22/postgresql-8.4.22.tar.gz
+postgres_data_dir: /usr/local/pgsql/data
+postgres_size_check: 838860800
+
+staging_repo_url: https://ptapps.redhat.com/svn/prjtrk/trunk
+staging_instance: prjtrk
+
+bugfix_repo_url: https://ptapps.redhat.com/svn/prjtrk/branches/prod-20161210
+bugfix_instance: pttest
+
+backup_host: server02.gps.hst.phx2.redhat.com
+backup_user: nblomber
+backup_dir: /mnt/storage/backup/pgsql

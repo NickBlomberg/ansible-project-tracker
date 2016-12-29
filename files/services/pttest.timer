@@ -1,0 +1,8 @@
+[Unit]
+Description=Run the hotfix instance of Project Tracker
+
+[Timer]
+OnBootSec=1min
+
+[Install]
+WantedBy=timers.target

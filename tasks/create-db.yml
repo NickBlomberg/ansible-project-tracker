@@ -1,0 +1,45 @@
+---
+- name: DB ensure database exists for {{ instance }}
+  become: yes
+  become_user: postgres
+  postgresql_db:
+    name: "{{ instance }}"
+
+- name: DB ensure role exists for {{ instance }}
+  become: yes
+  become_user: postgres
+  postgresql_user:
+    name: "{{ instance }}"
+    password: "{{ instance }}"
+    role_attr_flags: CREATEROLE,CREATEDB,SUPERUSER
+  environment:
+    PATH: /usr/local/pgsql/bin:{{ ansible_env.PATH }}
+
+- name: DB find current database disk usage for {{ instance }}
+  raw: >
+    /usr/local/pgsql/bin/psql "{{ instance }}" "{{ instance }}" -c "SELECT pg_database_size('{{ instance }}');" |
+      sed -n "3p" | tr -d " \t\n\r "
+  register: database_size
+  changed_when: False
+
+- name: DB check the most recent backup available
+  raw: >
+    output=$(ssh -o "StrictHostKeyChecking=no" -i "{{ user_home }}/.ssh/id_rsa" "{{ backup_user }}@{{ backup_host }}" "ls -t /mnt/storage/backup/pgsql | head -1");echo "$output" | tr -d "\r\n"
+  register: latest_backup
+  when: database_size.stdout_lines[-1]|int < {{ postgres_size_check|int }}
+  changed_when: False
+
+- name: DB check if database backup has already been retrieved
+  stat: path="{{ user_home }}/{{ latest_backup.stdout_lines[-1] }}"
+  register: backup_exists
+  when: database_size.stdout_lines[-1]|int < {{ postgres_size_check|int }}
+
+- name: DB copy database backup from server
+  raw: >
+    scp -i "{{ user_home }}/.ssh/id_rsa" "{{ backup_user }}@{{ backup_host }}:{{ backup_dir }}/{{ latest_backup.stdout_lines[-1] }}" {{ user_home }}
+  when: database_size.stdout_lines[-1]|int < {{ postgres_size_check|int }} and backup_exists.stat.exists == False
+
+- name: DB import database backup
+  raw: >
+    bunzip2 -cs "{{ latest_backup.stdout_lines[-1] }}" | /usr/local/pgsql/bin/psql "{{ instance }}" "{{ instance }}"
+  when: database_size.stdout_lines[-1]|int < {{ postgres_size_check|int }}

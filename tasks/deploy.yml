@@ -1,0 +1,37 @@
+---
+- name: DEPLOY checkout source code
+  subversion:
+    repo: "{{ repo_url }}"
+    dest: "/data/web/{{ instance }}"
+
+- name: DEPLOY run fix script on {{ instance }}
+  command: >
+    /usr/local/pgsql/bin/psql "{{ instance }}" "{{ instance }}" -c "\i /data/web/{{ instance }}/db/fix-dev.sql"
+  when: database_size.stdout_lines[-1]|int < {{ postgres_size_check|int }}
+
+- name: DEPLOY run an additional fix script if configuring pttest
+  command: >
+    /usr/local/pgsql/bin/psql "{{ instance }}" "{{ instance }}" -c "\i /data/web/{{ instance }}/db/fix-dev-pttest.sql"
+  when: database_size.stdout_lines[-1]|int < {{ postgres_size_check|int}} and instance == "pttest"
+
+- name: DEPLOY ensure systemd service and timer exists for {{ instance }}
+  become: yes
+  copy:
+    src: "files/services/{{ item }}"
+    dest: "/usr/lib/systemd/system"
+  with_items:
+    - "{{ instance }}.service"
+    - "{{ instance }}.timer"
+
+- name: DEPLOY copy server configuration for {{ instance }} instance
+  become: yes
+  become_user: aolserver
+  copy:
+    src: "files/config/{{ instance }}.tcl"
+    dest: /etc/aolserver/
+
+- name: DEPLOY check that {{ instance }} service is started
+  service: name={{ instance }} state=started
+
+- name: DEPLOY ensure {{ instance }} timer is started and enabled
+  systemd: name="{{ instance }}.timer" state=started enabled=True

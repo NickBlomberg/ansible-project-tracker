@@ -1,0 +1,91 @@
+---
+- name: check if postgres binary is already installed
+  stat: path=/usr/local/pgsql/bin/postgres
+  register: pg_installed
+
+- name: fetch source code for Postgres 8.4.22
+  become: yes
+  unarchive:
+      src: "{{ postgres_source_url }}"
+      dest: /tmp/
+      remote_src: yes
+      owner: root
+      group: root
+      mode: 0700
+  when: pg_installed.stat.exists == False
+
+- name: configure postgres
+  become: yes
+  command: '"{{ item }}" chdir=/tmp/postgresql-8.4.22'
+  with_items:
+    - ./configure
+  when: pg_installed.stat.exists == False
+
+- name: make postgresql
+  become: yes
+  command: '"{{ item }}" chdir=/tmp/postgresql-8.4.22'
+  with_items:
+    - gmake
+  when: pg_installed.stat.exists == False
+
+- name: make install postgresql
+  become: yes
+  command: 'gmake install chdir=/tmp/postgresql-8.4.22'
+  when: pg_installed.stat.exists == False
+
+- name: make contrib extra modules for postgres
+  become: yes
+  command: '"{{ item }}" chdir=/tmp/postgresql-8.4.22/contrib'
+  with_items:
+    - gmake
+  when: pg_installed.stat.exists == False
+
+- name: make install extra modules for postgres
+  become: yes
+  command: 'gmake install chdir=/tmp/postgresql-8.4.22/contrib'
+  when: pg_installed.stat.exists == False
+
+- name: ensure the postgres user account is present
+  user:
+    name: postgres
+    createhome: no
+    state: present
+
+- name: ensure data directory is present
+  file:
+    path: "{{ postgres_data_dir }}"
+    state: directory
+    owner: postgres
+    group: postgres
+  when: pg_installed.stat.exists == False
+
+- name: Initialize Postgres database
+  become: yes
+  become_user: postgres
+  command: >
+    /usr/local/pgsql/bin/initdb -D "{{ postgres_data_dir }}"
+  when: pg_installed.stat.exists == False
+
+- name: copy Postgres service to host
+  become: yes
+  copy:
+    src: "files/services/postgresql.service"
+    dest: "/usr/lib/systemd/system"
+
+- name: start and enable Postgres service
+  service: name=postgresql state=started
+
+- name: create postgres socket directory
+  file: name=/var/run/postgresql state=directory
+
+- name: create symlink for Postgres socket
+  file:
+    src: /tmp/.s.PGSQL.5432
+    dest: /var/run/postgresql/.s.PGSQL.5432
+    state: link
+
+- name: ensure PATH environment variable contains postgre bin directory
+  lineinfile:
+    dest: "{{ user_home }}/.bash_profile"
+    regexp: "^PATH="
+    line: "PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:{{ user_home }}/.local/bin:{{ user_home }}/bin:/usr/local/pgsql/bin"

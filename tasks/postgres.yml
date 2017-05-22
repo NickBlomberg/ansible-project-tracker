@@ -1,9 +1,9 @@
 ---
-- name: check if postgres binary is already installed
+- name: POSTGRES check if postgres binary is already installed
   stat: path=/usr/local/pgsql/bin/postgres
   register: pg_installed
 
-- name: fetch source code for Postgres 8.4.22
+- name: POSTGRES fetch source code for Postgres 8.4.22
   become: yes
   unarchive:
       src: "{{ postgres_source_url }}"
@@ -14,44 +14,44 @@
       mode: 0700
   when: pg_installed.stat.exists == False
 
-- name: configure postgres
+- name: POSTGRES configure postgres
   become: yes
   command: '"{{ item }}" chdir=/tmp/postgresql-8.4.22'
   with_items:
     - ./configure
   when: pg_installed.stat.exists == False
 
-- name: make postgresql
+- name: POSTGRES make postgresql
   become: yes
   command: '"{{ item }}" chdir=/tmp/postgresql-8.4.22'
   with_items:
     - gmake
   when: pg_installed.stat.exists == False
 
-- name: make install postgresql
+- name: POSTGRES make install postgresql
   become: yes
   command: 'gmake install chdir=/tmp/postgresql-8.4.22'
   when: pg_installed.stat.exists == False
 
-- name: make contrib extra modules for postgres
+- name: POSTGRES make contrib extra modules for postgres
   become: yes
   command: '"{{ item }}" chdir=/tmp/postgresql-8.4.22/contrib'
   with_items:
     - gmake
   when: pg_installed.stat.exists == False
 
-- name: make install extra modules for postgres
+- name: POSTGRES make install extra modules for postgres
   become: yes
   command: 'gmake install chdir=/tmp/postgresql-8.4.22/contrib'
   when: pg_installed.stat.exists == False
 
-- name: ensure the postgres user account is present
+- name: POSTGRES ensure the postgres user account is present
   user:
     name: postgres
     createhome: no
     state: present
 
-- name: ensure data directory is present
+- name: POSTGRES ensure data directory is present
   file:
     path: "{{ postgres_data_dir }}"
     state: directory
@@ -59,32 +59,32 @@
     group: postgres
   when: pg_installed.stat.exists == False
 
-- name: Initialize Postgres database
+- name: POSTGRES initialize Postgres database
   become: yes
   become_user: postgres
   command: >
     /usr/local/pgsql/bin/initdb -D "{{ postgres_data_dir }}"
   when: pg_installed.stat.exists == False
 
-- name: copy Postgres service to host
+- name: POSTGRES copy Postgres service to host
   become: yes
   copy:
     src: "files/services/postgresql.service"
     dest: "/usr/lib/systemd/system"
 
-- name: start and enable Postgres service
+- name: POSTGRES start and enable Postgres service
   service: name=postgresql state=started
 
-- name: create postgres socket directory
+- name: POSTGRES create postgres socket directory
   file: name=/var/run/postgresql state=directory
 
-- name: create symlink for Postgres socket
+- name: POSTGRES create symlink for Postgres socket
   file:
     src: /tmp/.s.PGSQL.5432
     dest: /var/run/postgresql/.s.PGSQL.5432
     state: link
 
-- name: ensure PATH environment variable contains postgre bin directory
+- name: POSTGRES ensure PATH environment variable contains postgre bin directory
   lineinfile:
     dest: "{{ user_home }}/.bash_profile"
     regexp: "^PATH="

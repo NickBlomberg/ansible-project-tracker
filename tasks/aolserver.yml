@@ -30,7 +30,7 @@
     dest: /tmp/rpm/
 
 - name: AOLSERVER install aolserver RPMS
-  yum:
+  dnf:
     name: /tmp/rpm/{{ item }}.rpm
     state: present
   with_items:

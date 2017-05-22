@@ -22,8 +22,8 @@
   file:
     dest: "{{ user_home }}/.ssh/"
     mode: 0700
-    owner: vagrant
-    group: vagrant
+    owner: "{{ user_account }}"
+    group: "{{ user_account }}"
     state: directory
 
 - name: COMMON copy private key
@@ -31,13 +31,13 @@
     content: "{{ private_key }}"
     dest: "{{ user_home }}/.ssh/id_rsa"
     mode: 0600
-    owner: vagrant
-    group: vagrant
+    owner: "{{ user_account }}"
+    group: "{{ user_account }}"
 
 - name: COMMON copy public key
   copy:
     content: "{{ public_key }}"
     dest: "{{ user_home }}/.ssh/id_rsa.pub"
     mode: 0644
-    owner: vagrant
-    group: vagrant
+    owner: "{{ user_account }}"
+    group: "{{ user_account }}"

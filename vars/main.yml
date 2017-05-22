@@ -1,5 +1,5 @@
 ---
-user_account: vagrant
+user_account: nick
 user_home: "/home/{{ user_account }}"
 
 postgres_source_url: https://ftp.postgresql.org/pub/source/v8.4.22/postgresql-8.4.22.tar.gz

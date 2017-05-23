@@ -48,7 +48,6 @@
 - name: POSTGRES ensure the postgres user account is present
   user:
     name: postgres
-    createhome: no
     state: present
 
 - name: POSTGRES ensure data directory is present

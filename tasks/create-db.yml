@@ -41,5 +41,5 @@
 
 - name: DB import database backup
   raw: >
-    bunzip2 -cs "{{ latest_backup.stdout_lines[-1] }}" | /usr/local/pgsql/bin/psql "{{ instance }}" "{{ instance }}"
+    bunzip2 -cs "{{ user_home }}/{{ latest_backup.stdout_lines[-1] }}" | /usr/local/pgsql/bin/psql "{{ instance }}" "{{ instance }}"
   when: database_size.stdout_lines[-1]|int < {{ postgres_size_check|int }}

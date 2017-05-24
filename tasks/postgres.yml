@@ -85,7 +85,7 @@
 
 - name: POSTGRES ensure PATH environment variable contains postgre bin directory
   lineinfile:
-    dest: "{{ user_home }}/.bash_profile"
+    dest: "/home/postgres/.bash_profile"
     regexp: "^PATH="
     line: "PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:{{ user_home }}/.local/bin:{{ user_home }}/bin:/usr/local/pgsql/bin"
 

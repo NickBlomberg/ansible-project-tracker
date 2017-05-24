@@ -88,3 +88,13 @@
     dest: "{{ user_home }}/.bash_profile"
     regexp: "^PATH="
     line: "PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:{{ user_home }}/.local/bin:{{ user_home }}/bin:/usr/local/pgsql/bin"
+
+- name: POSTGRES disable RemoveIPC to prevent issues accessing database
+  lineinfile:
+    dest=/etc/systemd/logind.conf
+    line=RemoveIPC=no
+  register: ipc_disabled
+
+- name: POSTGRES restart logind service
+  service: name=systemd-logind state=restarted
+  when: ipc_disabled.changed

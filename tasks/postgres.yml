@@ -72,7 +72,7 @@
     dest: "/usr/lib/systemd/system"
 
 - name: POSTGRES start and enable Postgres service
-  service: name=postgresql state=started
+  service: name=postgresql state=started enabled=yes
 
 - name: POSTGRES create postgres socket directory
   file: name=/var/run/postgresql state=directory

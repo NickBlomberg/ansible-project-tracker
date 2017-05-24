@@ -41,3 +41,6 @@
     mode: 0644
     owner: "{{ user_account }}"
     group: "{{ user_account }}"
+
+- name: COMMON disable SELinux
+  selinux: state=disabled

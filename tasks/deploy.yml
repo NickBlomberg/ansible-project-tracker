@@ -5,13 +5,15 @@
     dest: "/data/web/{{ instance }}"
 
 - name: DEPLOY run fix script on {{ instance }}
-  command: >
-    /usr/local/pgsql/bin/psql "{{ instance }}" "{{ instance }}" -c "\i /data/web/{{ instance }}/db/fix-dev.sql"
+  command: /usr/local/pgsql/bin/psql "{{ instance }}" "{{ instance }}" -c "\i /data/web/{{ instance }}/db/fix-dev.sql"
+  args:
+    chdir: /data/web/{{ instance }}
   when: database_size.stdout_lines[-1]|int < postgres_size_check|int
 
 - name: DEPLOY run an additional fix script if configuring pttest
-  command: >
-    /usr/local/pgsql/bin/psql "{{ instance }}" "{{ instance }}" -c "\i /data/web/{{ instance }}/db/fix-dev-pttest.sql"
+  command: /usr/local/pgsql/bin/psql "{{ instance }}" "{{ instance }}" -c "\i /data/web/{{ instance }}/db/fix-dev-pttest.sql"
+  args:
+    chdir: /data/web/{{ instance }}
   when: database_size.stdout_lines[-1]|int < postgres_size_check|int and instance == "pttest"
 
 - name: DEPLOY ensure systemd service and timer exists for {{ instance }}

@@ -44,3 +44,6 @@
 
 - name: COMMON disable SELinux
   selinux: state=disabled
+
+- name: COMMON change hostname
+  hostname: name=dev

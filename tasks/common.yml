@@ -57,6 +57,22 @@
     state: started
     enabled: yes
 
+- name: COMMON ensure phpPgAdmin configuraion is listening to localhost
+  lineinfile:
+    state: present
+    path: "/etc/phpPgAdmin/config.inc.php"
+    regexp: "^.*\\$conf\\['servers'\\]\\[0\\]\\['host'\\].*$"
+    line: "\t$conf['servers'][0]['host'] = 'localhost';"
+    backrefs: yes
+
+- name: COMMON ensure phpMyAdmin can be accessed from all hosts
+  lineinfile:
+    state: present
+    path: "/etc/httpd/conf.d/phpPgAdmin.conf"
+    regexp: "^.*Require local.*$"
+    line: "\tRequire all granted"
+    backrefs: yes
+
 - name: COMMON disable SELinux
   selinux: state=disabled
 

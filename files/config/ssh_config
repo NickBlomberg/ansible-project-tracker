@@ -1,0 +1,11 @@
+TCPKeepAlive=yes
+ServerAliveInterval=15
+ServerAliveCountMax=6
+StrictHostKeyChecking=no
+Compression=yes
+ForwardAgent=yes
+
+Host pt
+	HostName server02.gps.hst.phx2.redhat.com
+	User nblomber
+	IdentityFile ~/.ssh/id_rsa

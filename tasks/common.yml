@@ -42,6 +42,14 @@
     owner: "{{ user_account }}"
     group: "{{ user_account }}"
 
+- name: COMMON copy ssh client config file
+  copy:
+    src: files/config/ssh_config
+    dest: "{{ user_home }}/.ssh/config"
+    owner: "{{ user_account }}"
+    group: "{{ user_account }}"
+    mode: 0600
+
 - name: COMMON disable SELinux
   selinux: state=disabled
 

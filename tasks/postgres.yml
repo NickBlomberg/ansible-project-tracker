@@ -93,8 +93,6 @@
   lineinfile:
     dest=/etc/systemd/logind.conf
     line=RemoveIPC=no
-  register: ipc_disabled
+  notify: restart logind
 
-- name: POSTGRES restart logind service
-  service: name=systemd-logind state=restarted
-  when: ipc_disabled.changed
+- meta: flush_handlers

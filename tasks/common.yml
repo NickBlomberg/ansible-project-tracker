@@ -18,6 +18,8 @@
       - redhat-rpm-config
       - libpqxx
       - httpd
+      - meld
+      - uudeview
 
 - name: COMMON ensure .ssh directory exists
   file:

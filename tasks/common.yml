@@ -18,6 +18,7 @@
       - redhat-rpm-config
       - libpqxx
       - httpd
+      - phpPgAdmin
       - meld
       - uudeview
 

@@ -62,3 +62,9 @@
 
 - name: COMMON change hostname
   hostname: name=dev
+
+- name: COMMON disable firewall
+  systemd:
+    name: firewalld
+    state: stopped
+    enabled: no

@@ -17,6 +17,7 @@
       - libselinux-python
       - redhat-rpm-config
       - libpqxx
+      - httpd
 
 - name: COMMON ensure .ssh directory exists
   file:
@@ -49,6 +50,12 @@
     owner: "{{ user_account }}"
     group: "{{ user_account }}"
     mode: 0600
+
+- name: ensure httpd service is started and enabled
+  systemd:
+    name: httpd
+    state: started
+    enabled: yes
 
 - name: COMMON disable SELinux
   selinux: state=disabled

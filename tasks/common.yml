@@ -72,6 +72,7 @@
     regexp: "^.*Require local.*$"
     line: "\tRequire all granted"
     backrefs: yes
+  notify: reload httpd
 
 - name: COMMON disable SELinux
   selinux: state=disabled

@@ -16,3 +16,6 @@
 
     - include: tasks/create-db.yml instance={{ bugfix_instance}}
     - include: tasks/deploy.yml instance=pttest repo_url={{ bugfix_repo_url }}
+
+  handlers:
+    - include: handlers/handlers.yml
